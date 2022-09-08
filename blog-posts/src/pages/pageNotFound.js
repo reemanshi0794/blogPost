@@ -1,7 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+
 const PageNotFound = (props) => {
+  let navigate = useNavigate();
   const handleOnClick = () => {
-    props.history.replace("./home");
+    navigate("./");
   };
   return (
     <div
@@ -11,7 +14,6 @@ const PageNotFound = (props) => {
       }}
     >
       <div>
-        <img className="mb-4" style={{ height: 46 }}></img>
         <h2 className="mb-4">Sorry, requested page not found!!</h2>
         <button color="primary" className="px-4 py-2" onClick={handleOnClick}>
           Go To Home

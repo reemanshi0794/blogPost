@@ -10,7 +10,7 @@ const styleMap = {
   },
 };
 
-function Style({ Icon, selected, onClick, style }) {
+function HighlightComponent({ Icon, selected, onClick, style }) {
   return (
     <div
       onClick={onClick}
@@ -30,6 +30,17 @@ function Style({ Icon, selected, onClick, style }) {
 function ContentEditor({ editorState, setEditorState }) {
   const editorRef = useRef(null);
 
+  const getSelectedText = () => {
+    const selectionState = editorState.getSelection();
+    const anchorKey = selectionState.getAnchorKey();
+    const currentContent = editorState.getCurrentContent();
+    const currentContentBlock = currentContent.getBlockForKey(anchorKey);
+    const start = selectionState.getStartOffset();
+    const end = selectionState.getEndOffset();
+    const selectedText = currentContentBlock.getText().slice(start, end);
+    return selectedText;
+  };
+
   const [element, toggleLayerProps] = useToggleLayer(
     ({ isOpen, layerProps }) =>
       isOpen && (
@@ -46,7 +57,7 @@ function ContentEditor({ editorState, setEditorState }) {
           }}
           onMouseDown={(evt) => evt.preventDefault()}
         >
-          <Style
+          <HighlightComponent
             Icon={"Highlight"}
             onClick={() => {
               setEditorState(RichUtils.toggleInlineStyle(editorState, "BOLD"));
@@ -75,10 +86,14 @@ function ContentEditor({ editorState, setEditorState }) {
     if (isCollapsed) {
       toggleLayerProps.close();
     } else {
-      toggleLayerProps.open({
-        clientRect: () => getVisibleSelectionRect(window),
-        target: document.body,
-      });
+      const selectedText = getSelectedText();
+      const isAlphanumeric = new RegExp("^[a-zA-Z0-9]*$");
+      if (isAlphanumeric.test(selectedText)) {
+        toggleLayerProps.open({
+          clientRect: () => getVisibleSelectionRect(window),
+          target: document.body,
+        });
+      }
     }
   }, [
     editorState.getSelection().isCollapsed(),
@@ -96,7 +111,7 @@ function ContentEditor({ editorState, setEditorState }) {
         ref={editorRef}
         editorState={editorState}
         customStyleMap={styleMap}
-        onChange={(editorState) => onEditorStateChange(editorState)}
+        onChange={onEditorStateChange}
         handleKeyCommand={(command, editorState) => {
           const newState = RichUtils.handleKeyCommand(editorState, command);
           if (newState) {

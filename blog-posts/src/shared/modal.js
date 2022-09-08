@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { BlogDetails } from "../pages";
-// import { Modal } from "reactstrap";
-import { Editor, EditorState, convertToRaw, ContentState } from "draft-js";
+import { EditorState, convertToRaw, ContentState } from "draft-js";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
-import ContentEditor from "../pages/contentEditor";
+import ContentEditor from "./contentEditor";
 export const Modal = (props) => {
   const { editBlog, setEditBlog } = props;
-
   const [blogDetails, setModalDetails] = useState(editBlog || {});
 
   useEffect(() => {
@@ -20,7 +17,7 @@ export const Modal = (props) => {
         )
       );
     }
-  }, [Object.keys(editBlog).length > 0]);
+  }, [editBlog]);
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
@@ -71,8 +68,10 @@ export const Modal = (props) => {
     props.addBlogData(blogDetails);
   };
   let buttonName = "Add";
+  let cardHeader = "Add Blog";
   if (Object.keys(editBlog).length > 0) {
     buttonName = "Save";
+    cardHeader = "Edit Blog";
   }
   return (
     <div
@@ -88,7 +87,7 @@ export const Modal = (props) => {
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">
-              New message
+              {cardHeader}
             </h5>
             <button
               type="button"
@@ -146,7 +145,6 @@ export const Modal = (props) => {
                   <ContentEditor
                     setEditorState={setEditorState}
                     editorState={editorState}
-                    // onChange={(e) => handleChange(e, "content")}
                   />
                 </div>
 
@@ -184,7 +182,7 @@ export const Modal = (props) => {
             <button
               onClick={() => onAddBlog()}
               type="button"
-              class="btn btn-primary"
+              class="btn btn-primary btn-info"
             >
               {buttonName}
             </button>
@@ -196,8 +194,6 @@ export const Modal = (props) => {
 };
 const BlogModal = (props) => {
   return <Modal {...props} />;
-
-  return <div />;
 };
 
 export default BlogModal;
